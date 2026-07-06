@@ -133,20 +133,12 @@
   .generate-btn:disabled{opacity:0.5; cursor:default;}
   .generate-btn:hover:not(:disabled){background:#164a2e;}
 
-  /* Output ticket */
   .ticket{
     background:#fff;
     border:1px solid var(--ink);
     position:relative;
     padding:28px 24px 20px;
     min-height:320px;
-  }
-  .ticket::before, .ticket::after{
-    content:"";
-    position:absolute;
-    left:0; right:0;
-    height:0;
-    border-top:2px dashed var(--line);
   }
   .ticket-head{
     display:flex;
@@ -193,11 +185,6 @@
     color:var(--ink);
   }
   .copy-btn:hover{background:var(--ink); color:#fff;}
-  .spinner{
-    font-family:'Courier New', monospace;
-    font-size:13px;
-    color:var(--green);
-  }
   .error{
     font-family:'Courier New', monospace;
     font-size:12px;
@@ -264,7 +251,7 @@
 </div>
 
 <script>
-  var currentType = "linkedin"; // "linkedin" or "proposal"
+  var currentType = "linkedin";
   var ticketCount = 0;
 
   var btnLinkedin = document.getElementById("btnLinkedin");
@@ -310,33 +297,25 @@
 
     var context = "You are writing for a real Pakistani freelancer/agency owner who works on platforms like Upwork, Fiverr, and LinkedIn. " +
       "This is going out under their real name to real clients or their real network — it must read like an actual working professional wrote it, " +
-      "not like AI-generated marketing copy. Use context that actually applies to Pakistani freelancers: PKR-to-USD rate framing when relevant, " +
-      "realistic Upwork/Fiverr norms (client trust, portfolio proof, timezone handling, payment protection). " +
-      "Ground everything in the specific details given below — do not invent fake stats, fake client names, fake numbers, or generic claims that " +
-      "cannot be backed up. If a detail isn't given, keep the language general rather than making something up. " +
-      "No corporate buzzwords, no 'excited to announce', no em-dash-heavy AI cadence, no excessive emojis, no hashtag walls. " +
+      "not like AI-generated marketing copy. Ground everything in the specific details given below — do not invent fake stats, fake client names, " +
+      "fake numbers, or generic claims that cannot be backed up. No corporate buzzwords, no excessive emojis, no hashtag walls. " +
       "Write like a specific person with a specific voice, not a template.";
 
-    var hookRule = "The very first line is the most important part — it must be a strong, specific hook that stops the scroll or grabs a client's " +
-      "attention immediately (a sharp observation, a direct claim, a real detail, or a pointed question). Never open with a generic greeting, " +
-      "a weather-report style statement, or a throat-clearing sentence. The reader should want to keep reading after line one.";
+    var hookRule = "The very first line must be a strong, specific hook that grabs attention immediately. Never open with a generic greeting.";
 
     var task;
     if (currentType === "linkedin") {
       task = "Write a LinkedIn post (120-200 words) for a " + niche + ". Topic: " + topic + ". " +
-        (extra ? "Additional real context to weave in naturally: " + extra + ". " : "") +
-        "Tone: " + tone + ". " + hookRule + " " +
-        "End with a soft, non-cringe close — a genuine takeaway or a light invitation for comments/DMs, not a hard sell or 'let's connect!' cliche.";
+        (extra ? "Additional real context: " + extra + ". " : "") +
+        "Tone: " + tone + ". " + hookRule + " End with a soft, non-cringe close.";
     } else {
       task = "Write a short, tailored Upwork/Fiverr proposal (100-150 words) for a " + niche + ". Job/client need: " + topic + ". " +
         (extra ? "Rate to mention: " + extra + ". " : "") +
-        "Tone: " + tone + ". " + hookRule + " " +
-        "The opening line must reference something specific from the job description itself, proving this isn't a copy-pasted template. " +
-        "Show relevant proof briefly and honestly (based only on the context given), and end with one clear, low-friction next step. " +
-        "Never use 'Dear Hiring Manager', 'I am writing to apply', or any generic proposal opener.";
+        "Tone: " + tone + ". " + hookRule + " The opening line must reference something specific from the job description. " +
+        "Never use 'Dear Hiring Manager'.";
     }
 
-    return context + "\n\n" + task + "\n\nReturn only the finished text, no preamble, no labels, no quotation marks around it.";
+    return context + "\n\n" + task + "\n\nReturn only the finished text, no preamble, no quotation marks.";
   }
 
   function setLoading(isLoading) {
@@ -358,12 +337,10 @@
 
     var prompt = buildPrompt();
 
-    fetch("https://api.anthropic.com/v1/messages", {
+    fetch("https://ledger-proxy.malixwordpressdeveloper78648.workers.dev", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
         messages: [{ role: "user", content: prompt }]
       })
     })
