@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ledger — Content for Pakistani Freelancers</title>
+<style>
+  :root{
+    --ink:#1B1F1D;
+    --paper:#F6F5F0;
+    --paper-dim:#EDEBE2;
+    --green:#0E3B23;
+    --green-bright:#3FA66B;
+    --gold:#C9A227;
+    --line: rgba(27,31,29,0.15);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1000px;
+    margin:0 auto;
+    padding:40px 24px 80px;
+  }
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:16px;
+    margin-bottom:32px;
+  }
+  .brand{
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:-0.5px;
+  }
+  .brand span{color:var(--green-bright);}
+  .tag{
+    font-family: 'Courier New', monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--green);
+    opacity:0.75;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap:32px;
+  }
+  @media (max-width:800px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:24px;
+  }
+  .panel h2{
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--green);
+    margin:0 0 20px;
+    padding-bottom:10px;
+    border-bottom:1px dashed var(--line);
+  }
+  .toggle{
+    display:flex;
+    border:1px solid var(--ink);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  .toggle button{
+    flex:1;
+    padding:10px;
+    background:#fff;
+    border:none;
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .toggle button.active{
+    background:var(--ink);
+    color:var(--paper);
+  }
+  label{
+    display:block;
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:0.7;
+    margin:16px 0 6px;
+  }
+  input[type=text], textarea, select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:2px;
+    font-family:'Georgia', serif;
+    font-size:14px;
+    background:var(--paper-dim);
+    color:var(--ink);
+  }
+  textarea{min-height:80px; resize:vertical;}
+  .generate-btn{
+    margin-top:24px;
+    width:100%;
+    padding:14px;
+    background:var(--green);
+    color:#fff;
+    border:none;
+    border-radius:2px;
+    font-family:'Courier New', monospace;
+    font-size:13px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    cursor:pointer;
+  }
+  .generate-btn:disabled{opacity:0.5; cursor:default;}
+  .generate-btn:hover:not(:disabled){background:#164a2e;}
+
+  /* Output ticket */
+  .ticket{
+    background:#fff;
+    border:1px solid var(--ink);
+    position:relative;
+    padding:28px 24px 20px;
+    min-height:320px;
+  }
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    height:0;
+    border-top:2px dashed var(--line);
+  }
+  .ticket-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .ticket-id{
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    color:var(--gold);
+    letter-spacing:1px;
+  }
+  .ticket-body{
+    font-size:15px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    min-height:180px;
+  }
+  .placeholder{
+    color:var(--ink);
+    opacity:0.35;
+    font-style:italic;
+    font-size:14px;
+  }
+  .ticket-foot{
+    margin-top:20px;
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .copy-btn{
+    font-family:'Courier New', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:none;
+    border:1px solid var(--ink);
+    padding:6px 12px;
+    border-radius:2px;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .copy-btn:hover{background:var(--ink); color:#fff;}
+  .spinner{
+    font-family:'Courier New', monospace;
+    font-size:13px;
+    color:var(--green);
+  }
+  .error{
+    font-family:'Courier New', monospace;
+    font-size:12px;
+    color:#b03030;
+    margin-top:12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">LEDGER<span>.</span></div>
+      <div class="tag">Content, priced right, for Pakistani freelancers</div>
+    </div>
+    <div class="tag" id="dateStamp"></div>
+  </header>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Draft a brief</h2>
+
+      <div class="toggle">
+        <button id="btnLinkedin" class="active">LinkedIn Post</button>
+        <button id="btnProposal">Proposal</button>
+      </div>
+
+      <label>Your field / niche</label>
+      <input type="text" id="niche" placeholder="e.g. WordPress developer, AI automation">
+
+      <label id="labelTopic">What's the post about?</label>
+      <textarea id="topic" placeholder="e.g. I just finished a WooCommerce store with local payment integration for a client"></textarea>
+
+      <label id="labelExtra">Rate / context to mention (optional)</label>
+      <input type="text" id="extra" placeholder="e.g. charging in PKR, client is US-based">
+
+      <label>Tone</label>
+      <select id="tone">
+        <option>Confident & direct</option>
+        <option>Friendly & humble</option>
+        <option>Storytelling</option>
+      </select>
+
+      <button class="generate-btn" id="generateBtn">Generate</button>
+      <div class="error" id="errorBox"></div>
+    </div>
+
+    <div class="panel" style="padding:0; background:transparent; border:none;">
+      <div class="ticket">
+        <div class="ticket-head">
+          <div class="ticket-id" id="ticketType">LINKEDIN POST</div>
+          <div class="ticket-id" id="ticketNo">NO. 001</div>
+        </div>
+        <div class="ticket-body" id="output">
+          <span class="placeholder">Fill the brief on the left and hit Generate — your post or proposal will show up here, written with Pakistani freelancer context (PKR rates, Upwork/Fiverr norms) baked in.</span>
+        </div>
+        <div class="ticket-foot">
+          <span class="tag" id="statusText">Ready</span>
+          <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var currentType = "linkedin"; // "linkedin" or "proposal"
+  var ticketCount = 0;
+
+  var btnLinkedin = document.getElementById("btnLinkedin");
+  var btnProposal = document.getElementById("btnProposal");
+  var labelTopic = document.getElementById("labelTopic");
+  var labelExtra = document.getElementById("labelExtra");
+  var topicField = document.getElementById("topic");
+  var ticketType = document.getElementById("ticketType");
+  var output = document.getElementById("output");
+  var errorBox = document.getElementById("errorBox");
+  var statusText = document.getElementById("statusText");
+  var generateBtn = document.getElementById("generateBtn");
+  var copyBtn = document.getElementById("copyBtn");
+  var ticketNo = document.getElementById("ticketNo");
+
+  function setType(type) {
+    currentType = type;
+    if (type === "linkedin") {
+      btnLinkedin.classList.add("active");
+      btnProposal.classList.remove("active");
+      labelTopic.textContent = "What's the post about?";
+      labelExtra.textContent = "Rate / context to mention (optional)";
+      topicField.placeholder = "e.g. I just finished a WooCommerce store with local payment integration for a client";
+      ticketType.textContent = "LINKEDIN POST";
+    } else {
+      btnProposal.classList.add("active");
+      btnLinkedin.classList.remove("active");
+      labelTopic.textContent = "Paste the job description / what the client needs";
+      labelExtra.textContent = "Your rate (PKR or USD/hr)";
+      topicField.placeholder = "e.g. Client needs a WordPress site rebuilt with WooCommerce and local payment gateways";
+      ticketType.textContent = "PROPOSAL";
+    }
+  }
+
+  btnLinkedin.addEventListener("click", function () { setType("linkedin"); });
+  btnProposal.addEventListener("click", function () { setType("proposal"); });
+
+  function buildPrompt() {
+    var niche = document.getElementById("niche").value.trim() || "freelancer";
+    var topic = document.getElementById("topic").value.trim();
+    var extra = document.getElementById("extra").value.trim();
+    var tone = document.getElementById("tone").value;
+
+    var context = "You are writing for a real Pakistani freelancer/agency owner who works on platforms like Upwork, Fiverr, and LinkedIn. " +
+      "This is going out under their real name to real clients or their real network — it must read like an actual working professional wrote it, " +
+      "not like AI-generated marketing copy. Use context that actually applies to Pakistani freelancers: PKR-to-USD rate framing when relevant, " +
+      "realistic Upwork/Fiverr norms (client trust, portfolio proof, timezone handling, payment protection). " +
+      "Ground everything in the specific details given below — do not invent fake stats, fake client names, fake numbers, or generic claims that " +
+      "cannot be backed up. If a detail isn't given, keep the language general rather than making something up. " +
+      "No corporate buzzwords, no 'excited to announce', no em-dash-heavy AI cadence, no excessive emojis, no hashtag walls. " +
+      "Write like a specific person with a specific voice, not a template.";
+
+    var hookRule = "The very first line is the most important part — it must be a strong, specific hook that stops the scroll or grabs a client's " +
+      "attention immediately (a sharp observation, a direct claim, a real detail, or a pointed question). Never open with a generic greeting, " +
+      "a weather-report style statement, or a throat-clearing sentence. The reader should want to keep reading after line one.";
+
+    var task;
+    if (currentType === "linkedin") {
+      task = "Write a LinkedIn post (120-200 words) for a " + niche + ". Topic: " + topic + ". " +
+        (extra ? "Additional real context to weave in naturally: " + extra + ". " : "") +
+        "Tone: " + tone + ". " + hookRule + " " +
+        "End with a soft, non-cringe close — a genuine takeaway or a light invitation for comments/DMs, not a hard sell or 'let's connect!' cliche.";
+    } else {
+      task = "Write a short, tailored Upwork/Fiverr proposal (100-150 words) for a " + niche + ". Job/client need: " + topic + ". " +
+        (extra ? "Rate to mention: " + extra + ". " : "") +
+        "Tone: " + tone + ". " + hookRule + " " +
+        "The opening line must reference something specific from the job description itself, proving this isn't a copy-pasted template. " +
+        "Show relevant proof briefly and honestly (based only on the context given), and end with one clear, low-friction next step. " +
+        "Never use 'Dear Hiring Manager', 'I am writing to apply', or any generic proposal opener.";
+    }
+
+    return context + "\n\n" + task + "\n\nReturn only the finished text, no preamble, no labels, no quotation marks around it.";
+  }
+
+  function setLoading(isLoading) {
+    generateBtn.disabled = isLoading;
+    generateBtn.textContent = isLoading ? "Generating..." : "Generate";
+    statusText.textContent = isLoading ? "Working..." : "Ready";
+  }
+
+  generateBtn.addEventListener("click", function () {
+    errorBox.textContent = "";
+    var topic = topicField.value.trim();
+    if (!topic) {
+      errorBox.textContent = "Please fill in the topic / job description first.";
+      return;
+    }
+
+    setLoading(true);
+    output.innerHTML = "<span class=\"placeholder\">Writing...</span>";
+
+    var prompt = buildPrompt();
+
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        setLoading(false);
+        var textBlocks = (data.content || []).filter(function (item) { return item.type === "text"; });
+        var text = textBlocks.map(function (t) { return t.text; }).join("\n").trim();
+        if (!text) {
+          errorBox.textContent = "No response generated. Try again.";
+          output.innerHTML = "<span class=\"placeholder\">No output.</span>";
+          return;
+        }
+        ticketCount += 1;
+        ticketNo.textContent = "NO. " + String(ticketCount).padStart(3, "0");
+        output.textContent = text;
+      })
+      .catch(function (err) {
+        setLoading(false);
+        errorBox.textContent = "Something went wrong. Please try again.";
+        output.innerHTML = "<span class=\"placeholder\">Error generating content.</span>";
+        console.error(err);
+      });
+  });
+
+  copyBtn.addEventListener("click", function () {
+    var text = output.textContent || "";
+    if (!text || text.indexOf("Fill the brief") !== -1 || text.indexOf("No output") !== -1) return;
+    navigator.clipboard.writeText(text).then(function () {
+      copyBtn.textContent = "Copied";
+      setTimeout(function () { copyBtn.textContent = "Copy"; }, 1500);
+    });
+  });
+
+  (function () {
+    var d = new Date();
+    var opts = { year: "numeric", month: "short", day: "2-digit" };
+    document.getElementById("dateStamp").textContent = d.toLocaleDateString("en-US", opts).toUpperCase();
+  })();
+</script>
+</body>
+</html>
